@@ -26,8 +26,22 @@ if host:isHost() then
   end)
 end
 
+local function isInArea(min, max)
+  local realmin = vec(math.min(min.x, max.x), math.min(min.y, max.y), math.min(min.z, max.z))
+  local realmax = vec(math.max(min.x, max.x), math.max(min.y, max.y), math.max(min.z, max.z))
+  local px, py, pz = player:getPos():unpack()
+  local x1, y1, z1 = realmin:unpack()
+  local x2, y2, z2 = realmax:unpack()
+  return (
+    ((x1 <= px) and (px <= x2)) and
+    ((y1 <= py) and (py <= y2)) and
+    ((z1 <= pz) and (pz <= z2))
+  )
+end
+
 function events.TICK()
   if not BunnyPlate then return end
+  local showHealth = isInArea(vec(-450, 68, 168), vec(-520, 90, 111))
   for k, v in pairs(tasks) do
     if not afk or v.age > 180 then
       v.task:remove()
@@ -67,7 +81,7 @@ function events.TICK()
         color = "#888888"
       },
       (showHealth and {
-        text = "HP: " .. math.round(player:getHealth() + player:getAbsorptionAmount()) .. "/" .. player:getMaxHealth(),
+        text = "\nHP: " .. math.round(player:getHealth() + player:getAbsorptionAmount()) .. "/" .. player:getMaxHealth(),
         font = "default",
         color = (player:getAbsorptionAmount() > 0 and "gold") or "red"
       } or {text=""})

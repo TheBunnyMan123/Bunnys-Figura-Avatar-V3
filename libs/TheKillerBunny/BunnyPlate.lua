@@ -82,34 +82,10 @@ return function(steps, col1, col2, ...)
     end
   end
 
-  local cache = {}
-
   function events.WORLD_TICK()
     nameTick = ((nameTick + 1) % (#genGradient - 1)) + 1
-    if not cache[toJson(customBadges)] then
-      cache[toJson(customBadges)] = {}
-    end
-    if not cache[toJson(customBadges)][nameTick] then
-      cache[toJson(customBadges)][nameTick] = {}
-    end
-
     local scale = ((nameplate.ENTITY:getScale() or 1) * 0.4)
     if type(scale) == "number" then scale = vec(scale, scale, scale) end
-
-    if cache[toJson(customBadges)][nameTick].all then
-      nameplate.ALL:setText(cache[toJson(customBadges)][nameTick].all)
-      nameHolder:setPivot(((nameplate.ENTITY:getPivot() or vec(0, 2, 0))*16):copy():sub(0, (client.getTextHeight(cache[toJson(customBadges)][nameTick].entity)/2)*scale.y))
-      nameTask
-      :setScale(scale)
-      :setPos(0, client.getTextHeight(toJson(compose)) / 2)
-      :setLight(nameplate.ENTITY:getLight())
-      :setBackgroundColor(nameplate.ENTITY:getBackgroundColor())
-      :setText(cache[toJson(customBadges)][nameTick].entity)
-      :setAlignment("CENTER")
-      :setOutline(true)
-
-      return
-    end
 
     local compose = {{text = "${badges}"}}
     local badgeIter = 0
@@ -125,6 +101,10 @@ return function(steps, col1, col2, ...)
           value = v.hover
         }
       })
+    end
+
+    if badgeIter > 0 then
+      table.insert(compose, {text="\n",font="default"})
     end
 
     local iter = 0
@@ -143,12 +123,12 @@ return function(steps, col1, col2, ...)
     end)
 
     nameplate.ALL:setText(toJson(compose))
-    cache[toJson(customBadges)][nameTick].all = toJson(compose)
     nameplate.ENTITY:setVisible(false)
    
     local isJson, extraJson = pcall(parseJson, extraText)
+    extraJson = (type(extraJson) == "table" and extraJson) or {}
 
-    if extraText and isJson and extraJson and extraText:match("^[%[{]") and extraJson.text ~= "" then
+    if extraText and isJson and extraJson and extraText:match("^[%[{]") and extraJson.text ~= "" and (extraJson[1] or {}).text ~= "" then
       table.insert(compose, {text="\n",font="default"})
       if extraJson[1] then
         for _, v in pairs(extraJson) do
@@ -157,7 +137,7 @@ return function(steps, col1, col2, ...)
       else
         table.insert(compose, extraJson)
       end
-    elseif extraText and extraText ~= "" and not isJson then
+    elseif extraText and extraText ~= "" and extraJson.text ~= "" and (extraJson[1] or {}).text ~= "" and not isJson then
       table.insert(compose, {
         text = "\n" .. extraText,
         font = "default",
@@ -166,14 +146,7 @@ return function(steps, col1, col2, ...)
     end
 
     table.remove(compose, 1)
-    if badgeIter == 0 then
-      local txt = compose[1].text
-      while txt ~= "\n" and not perm do
-        txt = compose[1] and compose[1].text or "\n"
-        table.remove(compose, 1)
-      end
-    end
-
+    
     avatar:setColor(genGradient[nameTick])
     avatar:setColor(genGradient[nameTick], "dev")
     avatar:setColor(genGradient[nameTick], "donator")
@@ -187,17 +160,17 @@ return function(steps, col1, col2, ...)
     avatar:store("horn_color", "#" .. vectors.rgbToHex(genGradient[nameTick]))
     avatar:store("halo_color", "#" .. vectors.rgbToHex(genGradient[nameTick]))
 
-    nameHolder:setPivot(((nameplate.ENTITY:getPivot() or vec(0, 2, 0))*16):copy():sub(0, (client.getTextHeight(toJson(compose))/2)*scale.y))
+    local pivot = ((nameplate.ENTITY:getPivot() or vec(0, 2, 0))*16):copy()
+    local height = scale.y*client.getTextHeight(toJson(compose))
+
+    nameHolder:setPivot(pivot:add(0, height+2))
     nameTask
     :setScale(scale)
-    :setPos(0, client.getTextHeight(toJson(compose)) / 2)
     :setLight(nameplate.ENTITY:getLight())
     :setBackgroundColor(nameplate.ENTITY:getBackgroundColor())
     :setText(toJson(compose))
     :setAlignment("CENTER")
     :setOutline(true)
-
-    cache[toJson(customBadges)][nameTick].entity = toJson(compose)
   end
 
   return {

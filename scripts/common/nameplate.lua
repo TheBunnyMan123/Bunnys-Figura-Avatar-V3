@@ -1,4 +1,4 @@
-local BunnyPlate = require("libs.TheKillerBunny.BunnyPlate")
+BunnyPlate = require("libs.TheKillerBunny.BunnyPlate")
 if client:getDate().month == 10 then
   BunnyPlate = BunnyPlate(20, vec(225, 134, 64), vec(235, 97, 35))
 elseif client:getDate().month == 12 then
@@ -14,6 +14,8 @@ function events.WORLD_TICK()
     BunnyPlate.setCustomBadge("DISCONNECTED", "", "figura:emoji_animated", "")
   end
 end
+
+nameplate.ENTITY:setPivot(0, -180, 0)
 
 local nameHolder = models.rabbit.root:newPart("TKBunny$ExtraNameplateHolder", "CAMERA")
 BunnyPlate.setText("Bunny")

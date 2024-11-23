@@ -203,7 +203,6 @@ events.WORLD_TICK:register(function()
       log("Not loading script " .. v)
       return
     else
-      print(v)
       require(v)
     end
   end)
