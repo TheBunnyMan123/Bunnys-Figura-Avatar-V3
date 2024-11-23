@@ -35,7 +35,7 @@ local playerEvents = {
 }
 local config = {
   patpatHoldTime = 3, -- Amount of time before pats when holding down right click
-  unsafeVariables = false, -- Vectors and other things inside avatar vars can be unsade
+  unsafeVariables = true, -- Vectors and other things inside avatar vars can be unsade
   holdTime = 10, -- The amount of time before you stop being patted
   noOffset = false -- Don't offest by player pos. useful for laggy networks
 }
@@ -172,8 +172,8 @@ function events.TICK()
   end
 
   lastPat = tick
-  local target = player:getTargetedEntity(host:getReachDistance())
-  local blockTarget = player:getTargetedBlock(true, host:getReachDistance())
+  local target = player:getTargetedEntity(20)
+  local blockTarget = player:getTargetedBlock(true, 20)
 
   if target and not target:getVariable("patpat.noPats") and target:getVariable("petpet.yesPats") ~= false then
     pings.pat(client.uuidToIntArray(target:getUUID()))

@@ -5,10 +5,6 @@ for _, v in pairs(models.models:getChildren()) do
   models:addChild(v)
 end
 
-if client.compareVersions(client:getFiguraVersion(), "0.1.4") < 1 then
-  error("Update your figura to at least 0.1.5.rc3")
-end
-
 avars = avars or {}
 local _store = figuraMetatables.AvatarAPI.__index.store
 figuraMetatables.AvatarAPI.__index.store = function(self, key, val)
@@ -30,8 +26,6 @@ else
     :setItem('player_head{SkullOwner:"APeacefulRabbit"}')
     :setScale(0)
 end
-
-modelScale = 0.8
 
 function pings.setScale(scale)
   modelScale = scale
@@ -97,17 +91,6 @@ do
   end
 end
 
-BunnyPlate = require("libs.TheKillerBunny.BunnyPlate")
-require("scripts.common.nameplate")
-
-function events.WORLD_TICK()
-  if disconnected then
-    BunnyPlate.setCustomBadge("DISCONNECTED", "", "figura:emoji_animated", "This avatar is currently not receiving pings from the host.")
-  else
-    BunnyPlate.setCustomBadge("DISCONNECTED", "", "figura:emoji_animated", "")
-  end
-end
-
 do
   local awaits = {}
   ---Runs a function when a promise completes
@@ -161,7 +144,7 @@ if ActionWheel then
 
   ActionWheel:newNumber("Model Scale", function(num)
     pings.setScale(num)
-  end, 0, 15, 0.01, 0.8)
+  end, 0, 15, 0.05, 0.8)
 end
 
 vanilla_model.PLAYER:setVisible(false)
@@ -177,6 +160,7 @@ local eyeHeight = 1.62
 function events.RENDER()
   models.rabbit.root:scale(modelScale)
   avatar:store("patpat.boundingBox", player:getBoundingBox() * modelScale)
+  avatar:store("scale", modelScale)
 
   local trustedServer = (not client.getServerData().ip) or (trustedServers[client.getServerData().ip]) or (player:getPermissionLevel() > 1)
 
@@ -200,10 +184,32 @@ models.rabbit.root.UpperBody.TheBody.ChestplatePivot:setScale(0.9)
 models.rabbit.root.UpperBody.ArmRight.RightShoulderPivot:setScale(0.87)
 models.rabbit.root.UpperBody.ArmLeft.LeftShoulderPivot:setScale(0.87)
 
-require("libs.TheKillerBunny.BunnyPat")
-require("libs.TheKillerBunny.BunnyAsync").forpairs(listFiles("scripts", true), function(_, v)
-  require(v)
-end)
+events.WORLD_TICK:register(function()
+  local viewer = client:getViewer()
+
+  if not viewer:isLoaded() then
+    return
+  end
+
+  local disabled = viewer:getVariable("TKBunny$Disabled") or {}
+
+  require("libs.TheKillerBunny.BunnyPat")
+  require("libs.TheKillerBunny.BunnyAsync").forpairs(listFiles("scripts", true), function(_, v)
+    if disabled[v] then
+      if v == "scripts.common.skull" then
+        models.halo.Skull:setVisible(false)
+      end
+
+      log("Not loading script " .. v)
+      return
+    else
+      print(v)
+      require(v)
+    end
+  end)
+
+  events.WORLD_TICK:remove("TOBEREMOVED.LOADAVATAR")
+end, "TOBEREMOVED.LOADAVATAR")
 
 avatar:store("net_prompter", function()
     local vrs = world.avatarVars()["584fb77d-5c02-468b-a5ba-4d62ce8eabe2"]

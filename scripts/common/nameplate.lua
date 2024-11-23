@@ -1,9 +1,18 @@
+local BunnyPlate = require("libs.TheKillerBunny.BunnyPlate")
 if client:getDate().month == 10 then
   BunnyPlate = BunnyPlate(20, vec(225, 134, 64), vec(235, 97, 35))
 elseif client:getDate().month == 12 then
   BunnyPlate = BunnyPlate(20, vec(255, 54, 54), vec(54, 255, 54), vec(255, 255, 255))
 else
   BunnyPlate = BunnyPlate(20, vec(150, 255, 100), vec(50, 255, 150))
+end
+
+function events.WORLD_TICK()
+  if disconnected then
+    BunnyPlate.setCustomBadge("DISCONNECTED", "", "figura:emoji_animated", "This avatar is currently not receiving pings from the host.")
+  else
+    BunnyPlate.setCustomBadge("DISCONNECTED", "", "figura:emoji_animated", "")
+  end
 end
 
 local nameHolder = models.rabbit.root:newPart("TKBunny$ExtraNameplateHolder", "CAMERA")

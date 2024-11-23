@@ -1,3 +1,4 @@
+#[]
 local tick = 0
 
 function pings.setafk(tick)
@@ -26,6 +27,7 @@ if host:isHost() then
 end
 
 function events.TICK()
+  if not BunnyPlate then return end
   for k, v in pairs(tasks) do
     if not afk or v.age > 180 then
       v.task:remove()
