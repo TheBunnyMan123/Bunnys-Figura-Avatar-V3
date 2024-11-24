@@ -23,7 +23,7 @@ limitations under the License.
 --]]
 
 local path = string.gsub(..., "/", ".")
-local gnpath = string.gsub(path, "%..*$", ".") .. "GNamimates.GNUI"
+local gnpath = string.gsub(path, "%..-$", ".") .. "GNamimates.GNUI"
 
 local gnui = require(gnpath .. ".main")
 local screen = gnui.getScreenCanvas()

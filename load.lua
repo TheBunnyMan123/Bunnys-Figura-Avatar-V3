@@ -113,6 +113,7 @@ do
 end
 
 if ActionWheel then
+  require("libs.GNamimates.GNUI.main")
   actionPages = {
     ui = ActionWheel:newPage({text = "UI Stuff", color = "#ff3636"}),
     avatar = ActionWheel:newPage({text = "Avatar Menu", color = "#ff7736"})
