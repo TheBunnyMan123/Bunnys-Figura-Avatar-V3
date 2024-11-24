@@ -38,6 +38,7 @@ theme.Button = {
     box.BUTTON_CHANGED:register(function (pressed,hovering)
       box.HoverBox:setVisible(hovering):setZMul(10)
     end,"GNUI.Hover")
+    box.HoverBox:setVisible(false)
   end,
   ---@param box GNUI.Button
   Default = function (box)

@@ -241,7 +241,6 @@ function Box:setVisible(visible)
     for _, child in pairs(self.Children) do
       child:setVisible(visible)
     end
-    --e()
     self.VISIBILITY_CHANGED:invoke(visible)
   end
   return self
