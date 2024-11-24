@@ -106,6 +106,7 @@ return function(steps, col1, col2, ...)
     if badgeIter > 0 then
       table.insert(compose, {text="\n",font="default"})
     end
+    table.insert(compose, " ")
 
     local iter = 0
     text:gsub("[\0-\x7F\xC2-\xFD][\x80-\xBF]*", function(s)
@@ -145,6 +146,7 @@ return function(steps, col1, col2, ...)
       })
     end
 
+    table.remove(compose, badgeIter+4)
     table.remove(compose, 1)
     
     avatar:setColor(genGradient[nameTick])

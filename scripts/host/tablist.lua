@@ -28,9 +28,9 @@ function events.WORLD_RENDER()
     for k, v in pairs(players) do
       local succ, plate = pcall(function()
         local chat, entity, list = goofy:getAvatarNameplate(uuidCache[v] or v)
-        chat = chat:gsub("${badges}", ""):gsub("\n", " "):gsub("\\n", " "):gsub("${name}", v)
-        entity = entity:gsub("${badges}", ""):gsub("\n", ""):gsub("\\n", ""):gsub("${name}", v)
-        list = list:gsub("${badges}", ""):gsub("\n", ""):gsub("\\n", ""):gsub("${name}", v)
+        chat = chat:gsub("\n", " "):gsub("\\n", " "):gsub("${name}", v):gsub("�", "")
+        entity = entity:gsub("\n", ""):gsub("\\n", ""):gsub("${name}", v):gsub("�", "")
+        list = list:gsub("\n", ""):gsub("\\n", ""):gsub("${name}", v):gsub("�", "")
 
         return list or entity or chat
       end)
