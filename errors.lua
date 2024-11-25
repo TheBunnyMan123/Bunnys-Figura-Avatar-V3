@@ -265,7 +265,9 @@ end
 
 if goofy then 
   function events.ERROR(msg)
-    goofy:stopAvatar(toJson(tracebackError(msg)))
+    local err = toJson(tracebackError(msg))
+    logJson(err)
+    goofy:stopAvatar(err)
     return true
   end
 else
