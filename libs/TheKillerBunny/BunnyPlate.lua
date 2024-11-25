@@ -146,7 +146,13 @@ return function(steps, col1, col2, ...)
       })
     end
 
-    table.remove(compose, badgeIter+4)
+    for i = 1, #compose do
+      if compose[i].text == string.sub(text, 1, 1) then
+        table.remove(compose, i-1)
+        break
+      end
+    end
+
     table.remove(compose, 1)
     
     avatar:setColor(genGradient[nameTick])

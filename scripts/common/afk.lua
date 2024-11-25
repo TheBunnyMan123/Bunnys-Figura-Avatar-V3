@@ -6,7 +6,6 @@ function pings.setafk(tick)
 end
 
 local oldPos = vectors.vec3(math.huge)
-
 local taskGroup = models:newPart("TKBunny-AFK-TextTasks", "WORLD")
 
 local tasks = {
