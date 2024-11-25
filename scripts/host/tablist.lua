@@ -49,6 +49,7 @@ function events.WORLD_RENDER()
       :setWidth(maxWidth)
       :setAlignment("CENTER")
       :setBackground(true)
+      :setLight(15)
       )
     end
   end
