@@ -5,6 +5,7 @@ local smokePivotRight = pack.SmokePivotRight
 local flight = false
 
 function events.TICK()
+
   local jetpackOn = (player:getGamemode() == "CREATIVE") or (player:getItem(5).id == "minecraft:elytra") or creativeFlying
   if player:getVelocity():length() > 0.22 and player:getVehicle() and player:getVehicle():getType() == "minecraft:minecart" then
     jetpackOn = true
@@ -18,7 +19,7 @@ function events.TICK()
     end
   end
 
-  pack:setVisible(jetpackOn)
+  pack:setVisible(jetpackOn or false)
   local smokeOn = player:isGliding() or creativeFlying
   smokeOn = smokeOn and jetpackOn
   if player:getVelocity():length() > 0.22 and player:getVehicle() and player:getVehicle():getType() == "minecraft:minecart" then
