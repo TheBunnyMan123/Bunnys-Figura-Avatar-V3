@@ -1,4 +1,3 @@
-#[]
 local tick = 0
 
 function pings.setafk(tick)
