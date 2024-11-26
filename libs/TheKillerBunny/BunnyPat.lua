@@ -181,7 +181,7 @@ function events.TICK()
     call("whilePat", myPatters)
   end
 
-  if (not right:isPressed() or not player:isSwingingArm()) and player:getVariable("bunnypat.id") ~= "" then
+  if (not right:isPressed() or not player:isSwingingArm()) and (player:getVariable("bunnypat.id") or "") ~= "" then
     pings.clearId()
   end
 

@@ -3,22 +3,16 @@ disconnected = false
 local disconnectedTick = -100000
 local tick = 0
 function events.WORLD_TICK()
-  disconnected = (disconnectedTick + (20 * 20)) < tick
-  tick = tick + 1
 end
 
 local pingNewIndex = figuraMetatables.PingAPI.__newindex
 local pingIndex = figuraMetatables.PingAPI.__index
 
 local function compress(...)
-  local compressed = table.pack(...)
-
-  return table.unpack(compressed)
+  return ...
 end
 local function uncompress(...)
-  local uncompressed = table.pack(...)
-
-  return table.unpack(uncompressed)
+  return ...
 end
 
 function figuraMetatables.PingAPI.__newindex(self, key, func)
@@ -30,7 +24,6 @@ end
 
 function figuraMetatables.PingAPI.__index(self, key)
   return function(...)
-    if not host:isHost() then return end
     pingIndex(self, key)(compress(...))
   end
 end
@@ -52,13 +45,11 @@ function syncToggles()
   ))
 end
 
-if not host:isHost() then return end
-
-local tick = 0
 function events.WORLD_TICK()
   tick = tick + 1
   if tick % (10*20) == 0 then
     syncToggles()
   end
+  disconnected = (disconnectedTick + (20 * 20)) < tick
 end
 
