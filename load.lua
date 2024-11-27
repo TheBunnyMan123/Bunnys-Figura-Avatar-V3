@@ -1,4 +1,4 @@
-require("errors")
+--require("errors")
 
 for _, v in pairs(models.models:getChildren()) do
   v:remove()
@@ -195,7 +195,6 @@ events.WORLD_TICK:register(function()
 
   local disabled = viewer:getVariable("TKBunny$Disabled") or {}
 
-  require("libs.TheKillerBunny.BunnyPat")
   require("libs.TheKillerBunny.BunnyAsync").forpairs(listFiles("scripts", true), function(_, v)
     if disabled[v] or (not host:isHost() and v:match("^scripts%.host")) then
       if v == "scripts.common.skull" then
