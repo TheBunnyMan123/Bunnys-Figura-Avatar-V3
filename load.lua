@@ -27,8 +27,26 @@ else
     :setScale(0)
 end
 
+local oldModelScale = 0.8
+local newModelScale = 0.8
+local targetModelScale = 0.8
 function pings.setScale(scale)
-  modelScale = scale
+  oldModelScale = modelScale
+  newModelScale = modelScale
+  targetModelScale = scale
+  events.TICK:register(function()
+    oldModelScale = newModelScale
+    newModelScale = math.lerp(oldModelScale, targetModelScale, 0.5)
+    if math.abs(targetModelScale - oldModelScale) < 0.001 then
+      oldModelScale = modelScale
+      newModelScale = modelScale
+      events.TICK:remove("TOREMOVE.SCALE")
+    end
+  end, "TOREMOVE.SCALE")
+end
+
+function events.RENDER(delta)
+  modelScale = math.lerp(oldModelScale, newModelScale, delta)
 end
 
 afk = false

@@ -2645,12 +2645,25 @@
 							"uuid": "f9cfe925-b960-4e94-daed-62ed0b5284a0",
 							"export": true,
 							"mirror_uv": false,
-							"isOpen": false,
+							"isOpen": true,
 							"locked": false,
 							"visibility": true,
 							"autouv": 0,
 							"children": [
 								"e84bb6f0-4e8e-3f47-cfb5-1f9e9602ba55",
+								{
+									"name": "HeightPivot",
+									"origin": [0, 32, 0],
+									"color": 0,
+									"uuid": "f29ca3de-21ce-2a73-2495-5664ad242630",
+									"export": true,
+									"mirror_uv": false,
+									"isOpen": true,
+									"locked": false,
+									"visibility": true,
+									"autouv": 0,
+									"children": []
+								},
 								"9c1fb163-57e5-683c-f23a-258e0977a67d",
 								"78c68acd-868b-f573-d38e-0971f7ffbba1",
 								{
