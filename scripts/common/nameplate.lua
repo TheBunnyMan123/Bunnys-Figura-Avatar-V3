@@ -15,7 +15,7 @@ function events.WORLD_TICK()
   end
 end
 
-nameplate.ENTITY:setPivot(0, -180, 0)
+nameplate.ENTITY:setPivot(0, -180, 0):setLight(15)
 
 local nameHolder = models.rabbit.root:newPart("TKBunny$ExtraNameplateHolder", "CAMERA")
 BunnyPlate.setText("Bunny")

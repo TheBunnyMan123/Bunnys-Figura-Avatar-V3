@@ -1,3 +1,4 @@
+local BunnyMacros = require "libs.TheKillerBunny.BunnyMacros"
 local figcolors = {
   AWESOME_BLUE = "#5EA5FF",
   PURPLE = "#A672EF",
@@ -159,7 +160,59 @@ function tracebackError(msg)
 
   if not code then return compose end
 
+  if not BunnyMacros.scriptUsesMacros(code) then
+    local oldcode = string.split(code, "\n")
+    code = {}
+    local readlines = {}
+    for i = -5, 5 do
+      if not readlines[math.clamp(line + i, 1, #oldcode)] then
+        table.insert(code, oldcode[math.clamp(line + i, 1, #oldcode)])
+        readlines[math.clamp(line + i, 1, #oldcode)] = true
+      end
+    end
+    code = table.concat(code, "\n")
+
+    local lex = require("libs.BlueMoonJune.lex")
+    table.insert(compose, {
+      text = "\n[Code]\n",
+      color = "#ff7b72"
+    })
+
+    for _, v in pairs(lex(code)) do
+      if v[1] == "comment" or v[1] == "ws" or v[1] == "mlcom" then
+        table.insert(compose, {
+          text = v[2],
+          color = "#888888"
+        })
+      elseif v[1] == "word" or v[1] == "number" then
+        table.insert(compose, {
+          text = v[2],
+          color = (v[2] == "true" or v[2] == "false") and "#ff8836" or "#36ffff"
+        })
+      elseif v[1] == "keyword" then
+        table.insert(compose, {
+          text = v[2],
+          color = "#3636ff"
+        })
+      elseif v[1] == "string" or v[1] == "mlstring" then
+        table.insert(compose, {
+          text = v[2],
+          color = "#36ff36"
+        })
+      elseif v[1] == "op" then
+        table.insert(compose, {
+          text = v[2],
+          color = "#ffffff"
+        })
+      end
+    end
+
+    return compose
+  end
+
+  code = originalScripts[script]
   local oldcode = string.split(code, "\n")
+
   code = {}
   local readlines = {}
   for i = -5, 5 do

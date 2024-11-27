@@ -117,7 +117,7 @@ return function(steps, col1, col2, ...)
       :setBackgroundColor(nameplate.ENTITY:getBackgroundColor())
       :setText(plateCache[cacheIndex][nameTick].entity)
       :setAlignment("CENTER")
-      :setOutline(true)
+      :setOutline(nameplate.ENTITY:hasOutline())
       return
     end
 
@@ -212,7 +212,7 @@ return function(steps, col1, col2, ...)
     :setBackgroundColor(nameplate.ENTITY:getBackgroundColor())
     :setText(toJson(compose):gsub("${badges}", ""))
     :setAlignment("CENTER")
-    :setOutline(true)
+    :setOutline(nameplate.ENTITY:hasOutline())
   end
 
   return {

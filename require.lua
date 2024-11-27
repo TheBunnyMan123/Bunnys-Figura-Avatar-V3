@@ -50,8 +50,14 @@ function require(module, globals)
     error("Invalid module " .. path)
   end
 
-  for k in pairs(script) do
-    script[k] = script[k] % 256
+  if math.max(table.unpack(script)) > 255 or math.min(table.unpack(script)) < 0 then
+    if collection then
+      collection:map(script, function(v) return v%256 end)
+    else
+      for k in pairs(script) do
+        script[k] = script[k] % 256
+      end
+    end
   end
 
   local untouchedScript = string.char(table.unpack(script))
@@ -67,12 +73,8 @@ function require(module, globals)
   end)
   pathWithoutFile = pathWithoutFile:gsub("/$", "")
 
-  local func, error = load(script, path, globals or _G)
-
-  if not func then
-    print(module)
-  end
-  assert(func, error)
+  local func, err = load(script, path, globals or _G)
+  assert(func, path .. (err or ": "):match(": .*$"))
 
   cache[path][globals or _G] = table.pack(func(pathWithoutFile, path:gsub(pathWithoutFile, "")) or "")
 

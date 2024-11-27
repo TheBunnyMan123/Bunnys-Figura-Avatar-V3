@@ -7,10 +7,10 @@ function lib.add(macrosToAdd)
   end
 end
 
-function lib.format(script)
+function lib.scriptUsesMacros(script)
   local metadata = script:match("^%#%[(.-)%]\n")
   if not metadata then
-    return script
+    return false
   end
 
   local mdata = {}
@@ -19,7 +19,11 @@ function lib.format(script)
     mdata[v] = true
   end)
 
-  if not mdata.macros_v1 then
+  return mdata.macros_v1
+end
+
+function lib.format(script)
+  if not lib.scriptUsesMacros(script) then
     return script
   end
 

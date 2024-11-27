@@ -160,6 +160,7 @@ local trustedServers = {
 local eyeHeight = 1.62
 function events.RENDER()
   models.rabbit.root:scale(modelScale)
+  renderer:setShadowRadius(0.5 * modelScale)
   avatar:store("patpat.boundingBox", player:getBoundingBox() * modelScale)
   avatar:store("scale", modelScale)
 
@@ -196,7 +197,7 @@ events.WORLD_TICK:register(function()
 
   require("libs.TheKillerBunny.BunnyPat")
   require("libs.TheKillerBunny.BunnyAsync").forpairs(listFiles("scripts", true), function(_, v)
-    if disabled[v] then
+    if disabled[v] or (not host:isHost() and v:match("^scripts%.host")) then
       if v == "scripts.common.skull" then
         models.halo.Skull:setVisible(false)
       end
