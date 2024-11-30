@@ -8,6 +8,7 @@ end
 
 local cheats = ActionWheel:newPage("Cheats")
 local superJump = cheats:newToggle("Super Jump", function() end)
+local windBurst = cheats:newToggle("Wind Burst", function() end)
 local fly = cheats:newToggle("Fly", function() end)
 local flySpeed = cheats:newNumber("Fly Speed", function() end, 0, 5, 0.1, 1)
 
@@ -17,6 +18,11 @@ cheats:newButton("Lock rotation", function()
   goofy:setBodyRot(targetRot.y)
 end)
 
+keybinds:fromVanilla("key.attack"):setOnPress(function()
+  if windBurst.isPressed and player:getTargetedEntity(host:getReachDistance() * 1.5) then
+    goofy:setVelocity(player:getVelocity():mul(1, 0, 1):add(0, 1, 0))
+  end
+end)
 keybinds:fromVanilla("key.jump"):setOnPress(function()
   if superJump.isPressed then
     goofy:setVelocity(player:getVelocity():mul(1, 0, 1):add(0, 1, 0))
