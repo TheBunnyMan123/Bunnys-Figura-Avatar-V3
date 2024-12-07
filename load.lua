@@ -186,6 +186,7 @@ function events.RENDER()
 
   renderer:setOffsetCameraPivot(0, (trustedServer and (eyeHeight * modelScale) - eyeHeight) or 0, 0)
   renderer:setEyeOffset(0, (trustedServer and (eyeHeight * modelScale) - eyeHeight) or 0, 0)
+  avatar:store("eyePos", vec(0, (trustedServer and (eyeHeight * modelScale) - eyeHeight) or 0, 0))
 end
 
 models.rabbit.root.LegLeft:setParentType("LEFT_LEG")
