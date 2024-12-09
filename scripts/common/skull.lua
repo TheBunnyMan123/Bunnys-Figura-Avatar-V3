@@ -361,7 +361,10 @@ function events.SKULL_RENDER(delta, block, item, entity)
     local success, error = pcall(modes[blockBelow:getID()].func, block, signdata, delta, backText)
 
     if not success then
-      local formatted = toJson(tracebackError(error))
+       print(_G, _G.tracebackError)
+      local formatted = toJson(
+         tracebackError(error)
+      )
       cache[cacheIndex].error = formatted
       table.insert(tasks, taskHolder:newText("error-"..tostring(block:getPos()))
         :setText(formatted)

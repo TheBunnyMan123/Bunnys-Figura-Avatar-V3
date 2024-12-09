@@ -22,7 +22,7 @@ local figcolors = {
 }
 
 local errored = false
-function tracebackError(msg)
+function _G.tracebackError(msg)
   local split = string.split(msg:gsub("\t", ""), "\n")
   local compose = {}
 
