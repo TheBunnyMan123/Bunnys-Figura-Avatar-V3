@@ -7,7 +7,7 @@ function pings.setPats(pat)
 end
 
 print(BunnyPat.ONCE_PAT)
-function BunnyPat.ONCE_PAT()
+BunnyPat.ONCE_PAT:register(function()
   pats = pats + 1
   if not player:isLoaded() then return end
 
@@ -21,6 +21,6 @@ function BunnyPat.ONCE_PAT()
     pings.setScale(modelScale + 0.1)
     pings.setPats(pats % 20)
   end
-end
+end)
 print(BunnyPat.ONCE_PAT)
 

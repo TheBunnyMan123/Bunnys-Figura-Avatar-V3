@@ -14,21 +14,37 @@ See the License for the specific language governing permissions and
 limitations under the License.
 --]]
 
-local eventLib = require(....."/BunnyEventLib")
-local patEvents = eventLib.newEvents()
+local eventLibExists, eventLib = pcall(require, ....."/BunnyEventLib")
+
+if not eventLibExists then
+   eventLib = {}
+   eventLib.newEvent = function()
+      return {
+         _registered = {},
+         register = function(self, func)
+            table.insert(self._registered, func)
+         end,
+         invoke = function(self)
+            for _, v in pairs(self._registered) do
+               v()
+            end
+         end
+      }
+   end
+end
+
+local patEvents = eventLibExists and eventLib.newEvents() or {}
 patEvents.ON_PAT = eventLib.newEvent() -- Runs when you start being patted
 patEvents.ON_UNPAT = eventLib.newEvent() -- Runs when you stop being patted
 patEvents.TOGGLE_PAT = eventLib.newEvent() -- Runs when you start or stop being patted
 patEvents.WHILE_PAT = eventLib.newEvent() -- Runs every tick you are being patted
 patEvents.ONCE_PAT = eventLib.newEvent() -- Runs each time someone pats you
 
+local particlesexist, bunnyparticles = pcall(require, ....."/BunnyParticles")
+print(particlesexist, bunnyparticles)
 local pats = 0
 local config = {
-   particle = require(....."/BunnyParticles").newParticle({
-      textures:fromVanilla("goldheart_2", "minecraft:textures/particle/goldheart_2.png"),
-      textures:fromVanilla("goldheart_1", "minecraft:textures/particle/goldheart_1.png"),
-      textures:fromVanilla("goldheart_0", "minecraft:textures/particle/goldheart_0.png")
-   }, 25, vec(0, 3, 0), 0.85),
+   particle = particles["heart"],
    velocity = vec(0, 3, 0),
 
    patpatHoldTime = 3, -- Amount of time before pats when holding down right click
@@ -37,6 +53,14 @@ local config = {
    noOffset = false, -- Don't offest by player pos. useful for laggy networks
    patRange = 1000, -- Patpat range
 }
+
+if particlesexist then
+   config.particle = bunnyparticles.newParticle({
+      textures:fromVanilla("goldheart_2", "minecraft:textures/particle/goldheart_2.png"),
+      textures:fromVanilla("goldheart_1", "minecraft:textures/particle/goldheart_1.png"),
+      textures:fromVanilla("goldheart_0", "minecraft:textures/particle/goldheart_0.png")
+   }, 25, vec(0, 3, 0), 0.85)
+end
 local lib = {}
 
 local myPatters = {}
