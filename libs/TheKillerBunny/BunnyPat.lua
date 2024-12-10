@@ -15,6 +15,7 @@ limitations under the License.
 --]]
 
 local eventLibExists, eventLib = pcall(require, ....."/BunnyEventLib")
+local baseBoundingBox = vec(0.6, 1.8, 0.6)
 
 if not eventLibExists then
    eventLib = {}
@@ -113,8 +114,8 @@ local function pat(target, overrideBox, overridePos, id)
    end
    local halfBox = targetInfo.box / 2
 
-   targetInfo.box:applyFunc(function(val) return val * math.random() end)
-   local particlePos = targetInfo.pos + targetInfo.box.xyz - halfBox.x_z
+   local box = targetInfo.box:copy():applyFunc(function(val) return val * math.random() end)
+   local particlePos = targetInfo.pos + box.xyz - halfBox.x_z
 
    if not noHearts then
       config.particle:setPos(particlePos):setVelocity(config.velocity * ((math.random() / 5) + 0.9)):spawn()
@@ -166,7 +167,9 @@ local getTargetedEntity = function()
    if not entity then
       if config.unsafeVariables then
          local pPos = player:getPos()
-         
+         local aabbs = {}
+         local aabbMap = {}
+
          for _, v in pairs(world.getEntities(pPos - config.patRange, pPos + config.patRange)) do
             if (v ~= player) and v:getVariable("patpat.boundingBox") then
                local halfBox = v:getVariable("patpat.boundingBox")
@@ -177,13 +180,17 @@ local getTargetedEntity = function()
                   pos + halfBox
                }
 
-               local hit = raycast:aabb(start, start + (player:getLookDir() * config.patRange), {aabb})
-
-               if hit then
-                  return v
-               end
+               table.insert(aabbs, aabb)
+               aabbMap[aabb] = v
             end
          end
+
+         local hit = raycast:aabb(start, start + (player:getLookDir() * config.patRange), aabbs)
+
+         if hit then
+            return aabbMap[hit]
+         end
+
       end
       return
    end
