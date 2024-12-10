@@ -3,6 +3,7 @@ local height = models.rabbit.root.UpperBody.TheHead.HeightPivot:getPivot().y / 1
 
 local scaleUnitMultipliers = {
   m = (1/height);
+  km = ((1/height) * 1000);
   cm = (100/height);
   mm = (1000/height);
   ["in"] = (0.0254/height);
