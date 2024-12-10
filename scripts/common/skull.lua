@@ -2,6 +2,8 @@ local tasks = {}
 local cache = {}
 local signlib = require("libs.TheKillerBunny.BunnySignLib")
 
+local InsideOutCube = models.InsideOutCube:setVisible(false):copy("InsideOutCube_Skull"):setParentType("SKULL")
+
 local function deepCopy(model, name)
   local part = model:copy(name)
 
@@ -14,6 +16,7 @@ local function deepCopy(model, name)
 end
 
 local model = deepCopy(models.rabbit.root, "Skull"):setParentType("SKULL"):setScale(0.3):setPos(0, -3, 0)
+--model:addChild(InsideOutCube)
 
 local function setParentTypeRec(model, tpe)
   for _, v in pairs(model:getChildren()) do
@@ -165,9 +168,21 @@ local modes = {
           :setPos(pos + vec(0, 32, 0))
           :setScale(scale)
           :setRot(autorot and vec(0, math.lerpAngle((tick - 1) * 2, tick * 2, delta) or 0, 0) or rot))
+      elseif signdata[1] == "INV" then
+        local display = signdata[2]
+        local autorot = (signdata[5] or "true") ~= "false"
+        local scale = compileVec(signdata[4] or "1,1,1")
+        local rot = compileVec(signdata[6] or "0,0,0")
+        local pos = compileVec(signdata[3] or "0,0,0")
+        + vec(0, autorot and math.sin(math.lerp((tick - 1) / 6, tick / 6, delta)) or 0, 0)
+
+        local cbe = InsideOutCube:copy("skull_inside_out_cube_" .. tostring(block:getPos())):setPrimaryRenderType(display):setScale(scale):setRot(autorot and vec(0, math.lerpAngle((tick - 1) * 2, tick * 2, delta) or 0, 0) or rot):setPos(pos)
+
+        model:addChild(cbe:setVisible(true))
+        table.insert(tasks, cbe)
       else
         table.insert(tasks, taskHolder.camera:newText("help")
-          :setText("TYPE (B|I);BLOCK/ITEM;POS (x,y,z);SCALE (x,y,z);AUTOROT (any|false);ROT (x,y,z)")
+          :setText("TYPE (B|I|INV);BLOCK/ITEM/RENDERTYPE;POS (x,y,z);SCALE (x,y,z);AUTOROT (any|false);ROT (x,y,z)")
           :setAlignment("CENTER")
           :setPos(0, 13, 0)
           :setScale(0.25)
@@ -261,6 +276,7 @@ local modes = {
 
 function events.SKULL_RENDER(delta, block, item, entity)
   model:setVisible(true)
+  InsideOutCube:setVisible(false)
   models.halo.Skull:setVisible(false):setSecondaryRenderType("EMISSIVE_SOLID"):setSecondaryTexture("CUSTOM", textures["models.halo.halo"])
   
   if entity and item:getEquipmentSlot() == "HEAD" then
