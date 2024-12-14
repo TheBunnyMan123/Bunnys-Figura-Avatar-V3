@@ -1,4 +1,5 @@
-local BunnyPat = require("libs.TheKillerBunny.BunnyPat")
+local BunnyPat, BunnyHeadPat = require("libs.TheKillerBunny.BunnyPat")
+
 
 local pats = 0
 
@@ -6,7 +7,6 @@ function pings.setPats(pat)
   pats = pat
 end
 
-print(BunnyPat.ONCE_PAT)
 BunnyPat.ONCE_PAT:register(function()
   pats = pats + 1
   if not player:isLoaded() then return end
@@ -22,5 +22,4 @@ BunnyPat.ONCE_PAT:register(function()
     pings.setPats(pats % 20)
   end
 end)
-print(BunnyPat.ONCE_PAT)
 

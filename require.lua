@@ -76,7 +76,7 @@ function require(module, globals)
   local func, err = load(script, path, globals or _G)
   assert(func, path .. (err or ": "):match(": .*$"))
 
-  cache[path][globals or _G] = table.pack(func(pathWithoutFile, path:gsub(pathWithoutFile, "")) or "")
+  cache[path][globals or _G] = table.pack(func(pathWithoutFile, path:gsub(pathWithoutFile, "")))
 
   return table.unpack(cache[path][globals or _G] or {})
 end
