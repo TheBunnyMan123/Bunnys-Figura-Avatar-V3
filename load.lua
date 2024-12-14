@@ -139,6 +139,7 @@ if ActionWheel then
 
   actionPages.ui:newToggle("Hide Chat", function(state)
     goofy:setDisableGUIElement("CHAT", state)
+    print(state)
   end)
 
   actionPages.avatar:newButton("Upload Avatar", function()

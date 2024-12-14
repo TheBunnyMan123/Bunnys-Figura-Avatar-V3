@@ -787,7 +787,7 @@ if host:isHost() then
 
     -- Hotfix
     if goofy then
-      goofy:setDisableGUIElement("CHAT", suggestionVisibility and hotfix)
+      --goofy:setDisableGUIElement("CHAT", suggestionVisibility and hotfix)
       renderer:setRenderHUD(not (infoVisibility and hotfix))
     else
       renderer:setRenderHUD(not (suggestionVisibility and hotfix))

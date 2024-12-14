@@ -5,5 +5,8 @@
     "TheKillerBunny"
   ],
   "color": "#5865f2",
-  "autoScripts": ["preload"]
+  "autoScripts": ["preload"],
+  "goofy:mixins": [
+    
+  ]
 }
