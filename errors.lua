@@ -1,3 +1,6 @@
+local component = require("libs.TheKillerBunny.TextComponents")
+local lex = require("libs.BlueMoonJune.lex")
+
 local BunnyMacros = require "libs.TheKillerBunny.BunnyMacros"
 local figcolors = {
   AWESOME_BLUE = "#5EA5FF",
@@ -20,11 +23,56 @@ local figcolors = {
   MODRINTH = "#1BD96A",
   CURSEFORGE = "#F16436",
 }
+local styles = {
+   default = component.newStyle(),
+   labelStyle = component.newStyle():setColor("#ff7b72"),
+   treeStyle = component.newStyle():setColor("#797979"),
+   javaStyle = component.newStyle():setColor("#f89820"),
+   softBlue = component.newStyle():setColor(vectors.hexToRGB(figcolors.SOFT_BLUE)),
+   gray = component.newStyle():setColor("gray"),
+   lineNumber = component.newStyle():setColor(vectors.hexToRGB(figcolors.BLUE)),
+   error = component.newStyle():setColor(vectors.hexToRGB(figcolors.LUA_ERROR)),
+   inBlock = component.newStyle():setColor("#896767"),
+   comment = component.newStyle():setColor("#888888"),
+   boolean = component.newStyle():setColor("#ff8836"),
+   word = component.newStyle():setColor("#36ffff"),
+   keyword = component.newStyle():setColor("#3636ff"),
+   string = component.newStyle():setColor("#36ff36"),
+   op = component.newStyle():setColor("#ffffff")
+}
+local components = {
+  treeComponent = component.newComponent("\n ↓ ", styles.treeStyle),
+  javaComponent = component.newComponent("<Java", styles.treeStyle),
+  colon = component.newComponent(" :", styles.gray)
+}
+
+local function lexCode(code)
+   local compose = component.newComponent("", styles.default)
+    for _, v in pairs(lex(code)) do
+      if v[1] == "comment" or v[1] == "ws" or v[1] == "mlcom" then
+        compose:append(component.newComponent(v[2], styles.comment))
+      elseif v[1] == "word" or v[1] == "number" then
+        if v[1] == "true" or v[1] == "false" then
+          compose:append(component.newComponent(v[2], styles.boolean))
+        else
+          compose:append(component.newComponent(v[2], styles.word))
+        end
+      elseif v[1] == "keyword" then
+        compose:append(component.newComponent(v[2], styles.keyword))
+      elseif v[1] == "string" or v[1] == "mlstring" then
+        compose:append(component.newComponent(v[2], styles.string))
+      elseif v[1] == "op" then
+        compose:append(component.newComponent(v[2], styles.op))
+      end
+    end
+
+    return compose
+end
 
 local errored = false
 function _G.tracebackError(msg)
   local split = string.split(msg:gsub("\t", ""), "\n")
-  local compose = {}
+  local compose = component.newComponent("[Traceback]", styles.labelStyle)
 
   local longestLineNumCount = 1
   msg:gsub(":[0-9]-:", function(str)
@@ -37,11 +85,6 @@ function _G.tracebackError(msg)
   table.remove(split, 2)
   local message = split[1]
   table.remove(split, 1)
-
-  table.insert(compose, {
-    text = "[Traceback]",
-    color = "#ff7b72"
-  })
 
   local oldSplit = {}
   for k, v in pairs(split) do
@@ -81,84 +124,38 @@ function _G.tracebackError(msg)
 
     linenum = linenum or "0"
 
-    table.insert(compose, {
-      text = " ↓ ",
-      color = "#797979"
-    })
+    compose:append(components.treeComponent)
     if java then
-      table.insert(compose, {
-        text = ("?"):rep(longestLineNumCount),
-        color = figcolors.SOFT_BLUE
-      })
-      table.insert(compose, {
-        text = " :",
-        color = "gray",
-      })
-      table.insert(compose, {
-        text = v:gsub(".[jJ]ava.: in", ""),
-        color = "#f89820"
-      })
-      table.insert(compose, {
-        text = "<Java",
-        color = "#797979"
-      })
+      compose:append(component.newComponent(("?"):rep(longestLineNumCount), styles.softBlue))
+      compose:append(components.colon)
+      compose:append(component.newComponent(v:gsub(".[jJ]ava.: in", ""), styles.javaStyle))
+      compose:append(components.javaComponent)
     else
-      table.insert(compose, {
-        text = ("0"):rep(math.clamp(longestLineNumCount - #linenum, 0, 5)) .. linenum,
-        color = figcolors.BLUE
-      })
-      table.insert(compose, {
-        text = " :",
-        color = "gray",
-      })
-    end
-
-    if not java then
-      table.insert(compose, {
-        text = " " .. path[1],
-        color = figcolors.LUA_ERROR
-      })
+      compose:append(component.newComponent(("0"):rep(math.clamp(longestLineNumCount - #linenum, 0, 5)) .. linenum, styles.lineNumber))
+      compose:append(components.colon)
+      compose:append(component.newComponent(" " .. path[1], styles.error))
       table.remove(path, 1)
+      
       for _, w in pairs(path) do
-        table.insert(compose, {
-          text = "<" .. w,
-          color = "#797979"
-        })
+        compose:append(component.newComponent("<" .. w, styles.treeStyle))
       end
+      
+      compose:append(components.colon)
+      table.remove(splitTrace, 1)
+      compose:append(component.newComponent(table.concat(splitTrace, " "), styles.inBlock))
     end
 
-    table.remove(splitTrace, 1)
-
-    if not java then
-      table.insert(compose, {
-        text = " : ",
-        color = "gray"
-      })
-      table.insert(compose, {
-        text = table.concat(splitTrace, " "),
-        color = "#896767"
-      })
-    end
   end
 
-  table.insert(compose, {
-    text = "\n[Error]\n",
-    color = "#ff7b72"
-  })
-  table.insert(compose, {
-    text = " → ",
-    color = "#797979"
-  })
-  table.insert(compose, {
-    text = message:gsub(".*:[0-9]+ ?", ""):gsub("^.", string.upper),
-    color = figcolors.LUA_ERROR
-  })
+  compose:append(component.newComponent("\n[Error]\n", styles.labelStyle))
+  compose:append(component.newComponent(" → ", styles.treeStyle))
+  compose:append(component.newComponent(message:gsub(".*:[0-9]+ ?", ""):gsub("^.", string.upper), styles.error))
 
   local script = oldSplit[1]:gsub("/", "."):gsub(":.*$", "")
   local line = tonumber(oldSplit[1]:match(":([0-9]+)%S"))
   local code = compiledScripts[script]
 
-  if not code then return compose end
+  if not code then return compose:toJson() end
 
   if not BunnyMacros.scriptUsesMacros(code) then
     local oldcode = string.split(code, "\n")
@@ -172,42 +169,10 @@ function _G.tracebackError(msg)
     end
     code = table.concat(code, "\n")
 
-    local lex = require("libs.BlueMoonJune.lex")
-    table.insert(compose, {
-      text = "\n[Code]\n",
-      color = "#ff7b72"
-    })
+    compose:append(component.newComponent("\n[Code]\n", styles.labelStyle))
+    compose:append(lexCode(code))
 
-    for _, v in pairs(lex(code)) do
-      if v[1] == "comment" or v[1] == "ws" or v[1] == "mlcom" then
-        table.insert(compose, {
-          text = v[2],
-          color = "#888888"
-        })
-      elseif v[1] == "word" or v[1] == "number" then
-        table.insert(compose, {
-          text = v[2],
-          color = (v[2] == "true" or v[2] == "false") and "#ff8836" or "#36ffff"
-        })
-      elseif v[1] == "keyword" then
-        table.insert(compose, {
-          text = v[2],
-          color = "#3636ff"
-        })
-      elseif v[1] == "string" or v[1] == "mlstring" then
-        table.insert(compose, {
-          text = v[2],
-          color = "#36ff36"
-        })
-      elseif v[1] == "op" then
-        table.insert(compose, {
-          text = v[2],
-          color = "#ffffff"
-        })
-      end
-    end
-
-    return compose
+    return compose:toJson()
   end
 
   code = originalScripts[script]
@@ -224,39 +189,9 @@ function _G.tracebackError(msg)
   code = table.concat(code, "\n")
 
   local lex = require("libs.BlueMoonJune.lex")
-  table.insert(compose, {
-    text = "\n[Compiled Code]\n",
-    color = "#ff7b72"
-  })
+  compose:append(component.newComponent("\n[Compiled Code]\n", styles.labelStyle))
 
-  for _, v in pairs(lex(code)) do
-    if v[1] == "comment" or v[1] == "ws" or v[1] == "mlcom" then
-      table.insert(compose, {
-        text = v[2],
-        color = "#888888"
-      })
-    elseif v[1] == "word" or v[1] == "number" then
-      table.insert(compose, {
-        text = v[2],
-        color = (v[2] == "true" or v[2] == "false") and "#ff8836" or "#36ffff"
-      })
-    elseif v[1] == "keyword" then
-      table.insert(compose, {
-        text = v[2],
-        color = "#3636ff"
-      })
-    elseif v[1] == "string" or v[1] == "mlstring" then
-      table.insert(compose, {
-        text = v[2],
-        color = "#36ff36"
-      })
-    elseif v[1] == "op" then
-      table.insert(compose, {
-        text = v[2],
-        color = "#ffffff"
-      })
-    end
-  end
+  compose:append(lexCode(code))
 
   code = originalScripts[script]
   oldcode = string.split(code, "\n")
@@ -270,41 +205,11 @@ function _G.tracebackError(msg)
   end
   code = table.concat(code, "\n")
 
-  table.insert(compose, {
-    text = "\n[Original Code]\n",
-    color = "#ff7b72"
-  })
+  compose:append(component.newComponent("\n[Original Code]\n", styles.labelStyle))
 
-  for _, v in pairs(lex(code)) do
-    if v[1] == "comment" or v[1] == "ws" or v[1] == "mlcom" then
-      table.insert(compose, {
-        text = v[2],
-        color = "#888888"
-      })
-    elseif v[1] == "word" or v[1] == "number" then
-      table.insert(compose, {
-        text = v[2],
-        color = (v[2] == "true" or v[2] == "false") and "#ff8836" or "#36ffff"
-      })
-    elseif v[1] == "keyword" then
-      table.insert(compose, {
-        text = v[2],
-        color = "#3636ff"
-      })
-    elseif v[1] == "string" or v[1] == "mlstring" then
-      table.insert(compose, {
-        text = v[2],
-        color = "#36ff36"
-      })
-    elseif v[1] == "op" then
-      table.insert(compose, {
-        text = v[2],
-        color = "#ffffff"
-      })
-    end
-  end
-
-  return compose
+  compose:append(lexCode(code))
+  
+  return compose:toJson()
 end
 
 local function newError(msg)
@@ -312,9 +217,7 @@ local function newError(msg)
     errored = true
     local err = tracebackError(msg)
 
-    logJson(toJson({
-      table.unpack(err)
-    }))
+    logJson(err)
 
     for _, v in pairs(events:getEvents()) do
       v:clear()
@@ -334,7 +237,7 @@ local function newError(msg)
         bold = true,
         hoverEvent = {
           action = "show_text",
-          value =err
+          value = parseJson(err)
         }
       },
       {
@@ -364,8 +267,9 @@ end
 
 if goofy then 
   function events.ERROR(msg)
-    local err = toJson(tracebackError(msg))
+    local err = tracebackError(msg)
     logJson(err)
+    host:clipboard(err)
     goofy:stopAvatar(err)
     return true
   end
