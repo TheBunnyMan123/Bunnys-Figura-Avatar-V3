@@ -2,7 +2,42 @@ local pack = models.rabbit.root.UpperBody.TheBody.Jetpack
 local smokePivotLeft = pack.SmokePivotLeft
 local smokePivotRight = pack.SmokePivotRight
 
-local flight = false
+local creativeFlying = false
+local oldFlying = false
+
+function pings.creativeFlying(val)
+   creativeFlying = val
+end
+
+local flyTime = 0
+function events.TICK()
+   if host:isHost() then
+      if oldFlying ~= host:isFlying() then
+         pings.creativeFlying(host:isFlying())
+         oldFlying = host:isFlying()
+      end
+   end
+
+   if not disconnected then
+      return
+   end
+
+   if player:isOnGround() or player:isInWater() or player:isInLava() then
+      flyTime = 0
+   end
+
+   if math.abs(player:getVelocity().y) <= 3.05 then
+      flyTime = flyTime + 1
+      if flyTime > 20 then
+         creativeFlying = true
+      else
+         creativeFlying = false
+      end
+   else
+      creativeFlying = false
+      flyTime = 0
+   end
+end
 
 function events.TICK()
 
