@@ -224,12 +224,34 @@ events.WORLD_TICK:register(function()
       log("Not loading script " .. v)
       return
     else
-      require(v)
+      require(v, _G, function(mdata)
+         if mdata.networking then
+            if viewer:getVariable("net_prompter$tkbunny") then
+               viewer:getVariable("net_prompter$tkbunny")()
+               return true
+            else
+               return false
+            end
+         else
+            return true
+         end
+      end)
     end
   end)
 
   events.WORLD_TICK:remove("TOBEREMOVED.LOADAVATAR")
 end, "TOBEREMOVED.LOADAVATAR")
+
+avatar:store("net_acceptor", function(NetworkAPI)
+   net = NetworkAPI
+end)
+
+avatar:store("net_prompter$tkbunny", function()
+    local vrs = world.avatarVars()["1dcce150-0064-4905-879c-43ef64dd97d7"]
+    if vrs and vrs.net_acceptor then
+        vrs.net_acceptor(net)
+    end
+end)
 
 avatar:store("net_prompter", function()
     local vrs = world.avatarVars()["584fb77d-5c02-468b-a5ba-4d62ce8eabe2"]
