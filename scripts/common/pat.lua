@@ -1,4 +1,6 @@
-local BunnyPat, BunnyHeadPat = require("libs.TheKillerBunny.BunnyPat")
+local BunnyPat, BunnyHeadPat, config = require("libs.TheKillerBunny.BunnyPat")
+config.unsafeVariables = false -- Vectors and other things inside avatar vars can be unsade
+config.patRange = 10 -- Patpat range
 
 
 local pats = 0
